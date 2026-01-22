@@ -135,9 +135,7 @@ const MarketingBoard: React.FC = () => {
         <div className="flex justify-between items-center mb-6">
            <h3 className="text-lg font-bold text-slate-800">营销成交与提现明细</h3>
            <div className="flex gap-2">
-             <button className="px-4 py-1.5 bg-slate-50 text-slate-600 rounded-lg text-xs font-bold border border-slate-200 hover:bg-slate-100 transition-all">
-               导出报表
-             </button>
+             {/* 核心修改：已移除“导出报表”按钮 */}
              <button className="px-4 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-900/10">
                批量结算
              </button>

@@ -55,9 +55,7 @@ const App: React.FC = () => {
                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                <span className="text-xs font-bold">系统运行正常</span>
             </div>
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all">
-              生成全平台体验报告
-            </button>
+            {/* 核心修改：已移除“生成全平台体验报告”按钮 */}
             <button className="bg-white p-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all relative">
               <i className="fa-regular fa-bell"></i>
               <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white"></span>
