@@ -6,6 +6,7 @@ import TRTCBoard from './components/TRTCBoard';
 import InstructionalBoard from './components/InstructionalBoard';
 import MarketingBoard from './components/MarketingBoard';
 import PlatformBoard from './components/PlatformBoard';
+import UserAnalysisBoard from './components/UserAnalysisBoard';
 import { DashboardType } from './types';
 
 const App: React.FC = () => {
@@ -17,6 +18,8 @@ const App: React.FC = () => {
         return <BusinessBoard />;
       case DashboardType.TRTC:
         return <TRTCBoard />;
+      case DashboardType.USER_ANALYSIS:
+        return <UserAnalysisBoard />;
       case DashboardType.INSTRUCTIONAL:
         return <InstructionalBoard />;
       case DashboardType.MARKETING:
@@ -32,6 +35,7 @@ const App: React.FC = () => {
     switch (activeTab) {
       case DashboardType.BUSINESS: return '经营看板';
       case DashboardType.TRTC: return 'TRTC 消耗分析';
+      case DashboardType.USER_ANALYSIS: return '用户与功能分析';
       case DashboardType.INSTRUCTIONAL: return '教学效能';
       case DashboardType.MARKETING: return '营销转化';
       case DashboardType.PLATFORM: return '运维风控';
@@ -50,6 +54,7 @@ const App: React.FC = () => {
             <p className="text-slate-500 font-medium mt-1">
               {activeTab === DashboardType.BUSINESS && '实时监控机构生命线，掌控整体营收与经营健康度'}
               {activeTab === DashboardType.TRTC && '全方位监控实时音视频云消耗，精准掌控商户成本支出'}
+              {activeTab === DashboardType.USER_ANALYSIS && '全方位透视用户活跃生命周期与核心功能交互深度'}
               {activeTab === DashboardType.INSTRUCTIONAL && '全方位洞察教学质量与学情反馈，提升完课率'}
               {activeTab === DashboardType.MARKETING && '精准定位流量流失环节，提升工具效能与转化 ROI'}
               {activeTab === DashboardType.PLATFORM && '监控 SaaS 资源水位与并发峰值，守护平台底层安全'}

@@ -30,9 +30,9 @@ const BusinessBoard: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* 筛选控制条 */}
-      <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-wrap items-center justify-between gap-5">
-        <div className="flex flex-wrap items-center gap-4 flex-1">
+      {/* 筛选控制条 - 调整为右对齐 */}
+      <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-wrap items-center justify-end gap-5">
+        <div className="flex flex-wrap items-center gap-4">
           {/* 1. 机构筛选 */}
           <div className="relative min-w-[220px]">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -87,11 +87,6 @@ const BusinessBoard: React.FC = () => {
             ))}
           </div>
         </div>
-
-        <div className="flex items-center gap-2 text-slate-400 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
-          <i className="fa-solid fa-clock-rotate-left text-[10px] animate-spin-slow"></i>
-          <span className="text-[10px] font-black uppercase tracking-widest">Auto Sync: 5m</span>
-        </div>
       </div>
 
       {/* Macro Layer: Platform Lifeline */}
@@ -127,7 +122,7 @@ const BusinessBoard: React.FC = () => {
         <div className="lg:col-span-2 bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
           <div className="flex justify-between items-center mb-10">
             <div>
-              <h3 className="text-lg font-black text-slate-900">平台收入 vs 机构交易趋势 (24h)</h3>
+              <h3 className="text-lg font-black text-slate-900">平台收入 vs 机构交易趋势</h3>
               <p className="text-xs text-slate-400 mt-1 font-medium">对比自营收入与第三方机构的交易规模走势</p>
             </div>
             <div className="flex gap-6">

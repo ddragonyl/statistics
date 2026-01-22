@@ -1,14 +1,14 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   BarChart, Bar, AreaChart, Area, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis
 } from 'recharts';
 
 const liveSummary = [
-  { label: '今日直播场次', value: '128', icon: 'fa-clapperboard', color: 'text-blue-500', sub: '实时活跃中' },
+  { label: '直播场次', value: '128', icon: 'fa-clapperboard', color: 'text-blue-500', sub: '实时活跃中' },
   { label: '累计直播时长', value: '4,280', unit: 'min', icon: 'fa-clock', color: 'text-indigo-500', sub: '环比昨日 +12%' },
-  { label: '今日报名人数', value: '1,560', unit: '人', icon: 'fa-user-check', color: 'text-emerald-500', sub: '转化率 14.2%' },
+  { label: '报名人数', value: '1,560', unit: '人', icon: 'fa-user-check', color: 'text-emerald-500', sub: '转化率 14.2%' },
   { label: '直播在线人数', value: '8,429', unit: '人', icon: 'fa-users-viewfinder', color: 'text-orange-500', sub: '瞬时峰值监测中' },
 ];
 
@@ -24,8 +24,8 @@ const transactionTrend = [
 
 const rechargeHistory = [
   { id: '1', org: '新东方北京校区', amount: '¥5,000', points: '50,000', method: '企业支付', time: '10:24:12' },
-  { id: '2', org: '学而思上海分部', amount: '¥2,000', points: '20,000', method: '兑换码', time: '09:15:45' },
-  { id: '3', org: '高途课堂', amount: '¥10,000', points: '100,000', method: '在线转账', time: '08:45:20' },
+  { id: '2', org: '学而思培优', amount: '¥2,000', points: '20,000', method: '兑换码', time: '09:15:45' },
+  { id: '3', org: '高途精品课', amount: '¥10,000', points: '100,000', method: '在线转账', time: '08:45:20' },
   { id: '4', org: '作业帮', amount: '¥3,500', points: '35,000', method: '果能点充值', time: '08:12:05' },
 ];
 
@@ -40,16 +40,78 @@ const radarData = [
 
 const orgStorageData = [
   { name: '新东方北京', 视频: 850, 素材: 240 },
-  { name: '学而思上海', 视频: 620, 素材: 180 },
+  { name: '学而思培优', 视频: 620, 素材: 180 },
   { name: '高途教育', 视频: 940, 素材: 310 },
   { name: '作业帮', 视频: 450, 素材: 520 },
   { name: '有道精品', 视频: 320, 素材: 150 },
 ];
 
 const InstructionalBoard: React.FC = () => {
+  const [selectedOrg, setSelectedOrg] = useState('all');
+  const [timeRange, setTimeRange] = useState('today');
+  const [dateRange, setDateRange] = useState({
+    start: '2024年05月01日',
+    end: '2024年05月22日'
+  });
+
   return (
     <div className="space-y-6">
-      {/* Top: 今日直播快报 Header */}
+      {/* 筛选控制条 - 保持右侧对齐 */}
+      <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-wrap items-center justify-end gap-5">
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="relative min-w-[220px]">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i className="fa-solid fa-building text-slate-400 text-xs"></i>
+            </div>
+            <select 
+              value={selectedOrg}
+              onChange={(e) => setSelectedOrg(e.target.value)}
+              className="block w-full pl-9 pr-10 py-2.5 text-sm border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 rounded-xl bg-slate-50 font-semibold text-slate-700 appearance-none cursor-pointer hover:bg-slate-100 transition-all border"
+            >
+              <option value="all">全平台机构 (所有商户)</option>
+              <option value="new-oriental">新东方教育集团</option>
+              <option value="tal">学而思培优</option>
+              <option value="gaotu">高途精品课</option>
+              <option value="zuoyebang">作业帮直播课</option>
+            </select>
+            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+              <i className="fa-solid fa-chevron-down text-slate-400 text-[10px]"></i>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:border-blue-400 transition-all group">
+            <i className="fa-regular fa-calendar-days text-slate-400 group-hover:text-blue-500 transition-colors"></i>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-bold text-slate-700 tracking-tight">{dateRange.start}</span>
+              <span className="text-slate-300 font-light">～</span>
+              <span className="text-sm font-bold text-slate-700 tracking-tight">{dateRange.end}</span>
+            </div>
+          </div>
+
+          <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200/50">
+            {[
+              { id: 'today', label: '今日' },
+              { id: 'yesterday', label: '昨日' },
+              { id: '7days', label: '近7日' },
+              { id: '30days', label: '近30日' },
+            ].map((range) => (
+              <button
+                key={range.id}
+                onClick={() => setTimeRange(range.id)}
+                className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                  timeRange === range.id 
+                    ? 'bg-white text-blue-600 shadow-sm border border-slate-100' 
+                    : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                {range.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Top: 今日直播快报 Header (已恢复“今日”文案) */}
       <div className="bg-white p-1 rounded-2xl shadow-sm border border-slate-100 flex flex-wrap md:flex-nowrap divide-y md:divide-y-0 md:divide-x divide-slate-100">
         {liveSummary.map((item) => (
           <div key={item.label} className="flex-1 p-6 min-w-[200px]">
@@ -66,7 +128,6 @@ const InstructionalBoard: React.FC = () => {
         ))}
       </div>
 
-      {/* Middle: 成交/退费对比 + 果能点充值记录 */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         <div className="lg:col-span-3 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
           <div className="flex justify-between items-center mb-6">
@@ -132,9 +193,7 @@ const InstructionalBoard: React.FC = () => {
         </div>
       </div>
 
-      {/* Bottom: AI Radar + Organization Storage Consumption Analysis */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        {/* Left: AI Radar */}
         <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
           <div className="flex items-center justify-between mb-2">
             <div>
@@ -164,7 +223,6 @@ const InstructionalBoard: React.FC = () => {
           </div>
         </div>
 
-        {/* Right: Top Organizations Storage Consumption Analysis */}
         <div className="lg:col-span-3 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
           <div className="flex justify-between items-center mb-6">
             <div>
