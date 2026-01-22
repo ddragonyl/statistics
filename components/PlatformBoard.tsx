@@ -1,276 +1,286 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { 
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
+  BarChart, Bar, PieChart, Pie, Cell, Legend
 } from 'recharts';
 
-// 实时延迟模拟数据
-const latencyData = [
-  { time: '14:00', api: 12, live: 45, load: 60 },
-  { time: '14:05', api: 15, live: 42, load: 62 },
-  { time: '14:10', api: 28, live: 120, load: 85 }, 
-  { time: '14:15', api: 18, live: 55, load: 70 },
-  { time: '14:20', api: 14, live: 48, load: 65 },
-  { time: '14:25', api: 16, live: 50, load: 64 },
+// --- 模拟高密度数据 ---
+const traffic24h = Array.from({ length: 24 }, (_, i) => ({
+  time: `${i}:00`,
+  pv: Math.floor(Math.random() * 200) + 50,
+  uv: Math.floor(Math.random() * 50) + 10
+}));
+
+const traffic7d = Array.from({ length: 7 }, (_, i) => ({
+  date: `01-${16 + i}`,
+  pv: Math.floor(Math.random() * 2000) + 1000,
+  uv: Math.floor(Math.random() * 500) + 200
+}));
+
+const topLocations = [
+  { name: '北京市', value: 11653 },
+  { name: '广东省', value: 1668 },
+  { name: '新加坡', value: 141 },
+  { name: '天津市', value: 80 },
+  { name: '上海市', value: 58 },
+  { name: '江苏省', value: 56 },
 ];
 
-// 风险事件流
-const riskEvents = [
-  { id: 1, time: '14:32:10', type: 'FINANCE', msg: '博雅教育：短时集中退费 (25笔/1h)', level: 'danger', action: '提现锁定' },
-  { id: 2, time: '14:30:45', type: 'OPS', msg: '华南 CDN 节点带宽触顶，启动弹性分流', level: 'warning', action: '自动调度' },
-  { id: 3, time: '14:28:12', type: 'CONTENT', msg: '直播间 #8829 识别到疑似违规敏感词', level: 'warning', action: '人工介入' },
-  { id: 4, time: '14:25:00', type: 'AUTH', msg: '账号 user_9921 异地高频登录 (北京/成都)', level: 'info', action: '日志标记' },
+const deviceData = [
+  { name: 'PC', value: 75, color: '#3b82f6' },
+  { name: 'Mobile', value: 25, color: '#60a5fa' },
+];
+
+const osData = [
+  { name: 'Android', value: 45, color: '#10b981' },
+  { name: 'iOS', value: 40, color: '#34d399' },
+  { name: 'Other', value: 15, color: '#a7f3d0' },
+];
+
+const topUrls = [
+  { url: '/', pv: 11769, uv: 158, success: '99.99%' },
+  { url: '/live/21464/auto', pv: 1215, uv: 2, success: '98.44%' },
+  { url: '/live/21469/auto', pv: 269, uv: 2, success: '52.04%' },
+  { url: '/live/21463/auto', pv: 130, uv: 2, success: '54.62%' },
+  { url: '/robots.txt', pv: 64, uv: 47, success: '100%' },
+];
+
+const topIps = [
+  { ip: '47.94.44.217', country: '中国', province: '北京市', isp: '阿里巴巴', pv: 11523 },
+  { ip: '106.55.200.246', country: '中国', province: '广东省', isp: '腾讯', pv: 1204 },
+  { ip: '106.55.200.45', country: '中国', province: '广东省', isp: '腾讯', pv: 271 },
+  { ip: '4.194.107.19', country: '新加坡', province: 'Singapore', isp: 'microsoft', pv: 132 },
+  { ip: '81.71.5.172', country: '中国', province: '广东省', isp: '腾讯', pv: 129 },
 ];
 
 const PlatformBoard: React.FC = () => {
-  const [pulse, setPulse] = useState(true);
-
-  useEffect(() => {
-    const timer = setInterval(() => setPulse(p => !p), 2000);
-    return () => clearInterval(timer);
-  }, []);
-
   return (
-    <div className="bg-[#0D1117] -m-8 p-8 min-h-screen text-slate-300 selection:bg-cyan-500/30">
-      {/* 顶部 HUD 核心监控条 */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        {/* 全局状态球 */}
-        <div className="bg-slate-900/60 border border-slate-800 p-6 rounded-3xl relative overflow-hidden flex items-center gap-5">
-          <div className="relative">
-            <div className={`w-14 h-14 rounded-full flex items-center justify-center border transition-all duration-1000 ${pulse ? 'bg-emerald-500/20 border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.3)]' : 'bg-slate-800 border-slate-700'}`}>
-              <div className="w-4 h-4 rounded-full bg-emerald-500 shadow-[0_0_10px_#10b981]"></div>
+    <div className="space-y-6 pb-10">
+      {/* 1. 核心流量指标 (顶部四格) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          { label: 'PV (环比)', val: '12,587', change: '17.70%', up: true },
+          { label: 'PV (周同比)', val: '12,587', change: '13.22%', up: true },
+          { label: 'UV (环比)', val: '354', change: '8.59%', up: true },
+          { label: 'UV (周同比)', val: '354', change: '0.56%', up: false },
+        ].map((item, idx) => (
+          <div key={idx} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden group">
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">{item.label}</p>
+            <div className="flex items-baseline gap-3">
+              <h3 className="text-3xl font-black text-slate-900">{item.val}</h3>
+              <div className={`flex items-center text-[10px] font-bold ${item.up ? 'text-emerald-500' : 'text-rose-500'}`}>
+                <i className={`fa-solid ${item.up ? 'fa-caret-up' : 'fa-caret-down'} mr-1`}></i>
+                {item.change}
+              </div>
             </div>
-            <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-slate-900 animate-ping"></div>
+            {/* 微型装饰线 */}
+            <div className="absolute bottom-0 left-0 w-full h-1 bg-slate-50">
+              <div className={`h-full ${idx < 2 ? 'bg-blue-500' : 'bg-indigo-500'} opacity-20`} style={{ width: '60%' }}></div>
+            </div>
           </div>
-          <div>
-            <h3 className="text-xl font-black text-white tracking-tight">系统极佳</h3>
-            <p className="text-[10px] text-emerald-400 font-bold uppercase tracking-widest">Global Status: Optimal</p>
+        ))}
+      </div>
+
+      {/* 2. 地理分布模拟 (两列) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-sm font-black text-slate-800">PV 省份分布 (Heatmap)</h3>
+            <i className="fa-solid fa-earth-asia text-slate-300"></i>
+          </div>
+          <div className="aspect-[16/9] bg-slate-50 rounded-xl flex items-center justify-center relative overflow-hidden group">
+             {/* 模拟地图视觉 */}
+             <i className="fa-solid fa-map text-slate-200 text-8xl group-hover:scale-110 transition-transform duration-700"></i>
+             <div className="absolute top-4 left-4 flex flex-col gap-2">
+                <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400">
+                   <span className="w-2 h-2 rounded-full bg-blue-500"></span> 高热度区域
+                </div>
+                <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400">
+                   <span className="w-2 h-2 rounded-full bg-blue-100"></span> 低热度区域
+                </div>
+             </div>
+             <div className="absolute bottom-4 right-4 text-[10px] font-bold text-slate-400 bg-white px-2 py-1 rounded shadow-sm border border-slate-100">
+                实时数据源: GeoIP2
+             </div>
           </div>
         </div>
-
-        {/* 核心指标 1 */}
-        <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-3xl">
-          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">QPS 请求成功率</p>
-          <div className="flex items-baseline gap-2">
-            <h3 className="text-2xl font-black text-white">99.99%</h3>
-            <span className="text-[10px] text-emerald-500 font-bold">Stable</span>
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-sm font-black text-slate-800">PV 国家分布 (Global)</h3>
+            <i className="fa-solid fa-globe text-slate-300"></i>
           </div>
-          <div className="w-full h-1 bg-slate-800 mt-4 rounded-full overflow-hidden">
-            <div className="h-full bg-emerald-500" style={{ width: '99%' }}></div>
+          <div className="aspect-[16/9] bg-slate-50 rounded-xl flex items-center justify-center relative group">
+             <i className="fa-solid fa-map-location-dot text-slate-200 text-8xl group-hover:scale-110 transition-transform duration-700"></i>
+             <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
           </div>
         </div>
+      </div>
 
-        {/* 核心指标 2 */}
-        <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-3xl">
-          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">今日拦截攻击</p>
-          <div className="flex items-baseline gap-2">
-            <h3 className="text-2xl font-black text-white">1,402</h3>
-            <span className="text-[10px] text-rose-500 font-bold">+12%</span>
+      {/* 3. 实时流量脉冲图 (24h & 7d) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+          <h3 className="text-sm font-black text-slate-800 mb-6 flex items-center gap-2">
+            <i className="fa-solid fa-wave-square text-blue-500 text-xs"></i>
+            近 1 天 PV/UV 趋势 (24h Pulse)
+          </h3>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={traffic24h}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <XAxis dataKey="time" hide />
+                <YAxis hide />
+                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', fontSize: '12px' }} />
+                <Area type="step" dataKey="pv" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.1} strokeWidth={1} />
+                <Area type="step" dataKey="uv" stroke="#10b981" fill="#10b981" fillOpacity={0.1} strokeWidth={1} />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
-          <div className="flex gap-1 mt-4">
-            {[1,1,1,1,1,1,0,0,0,0,0,0].map((v, i) => (
-              <div key={i} className={`h-1 flex-1 rounded-full ${v ? 'bg-indigo-500' : 'bg-slate-800'}`}></div>
+        </div>
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+          <h3 className="text-sm font-black text-slate-800 mb-6 flex items-center gap-2">
+            <i className="fa-solid fa-chart-line text-indigo-500 text-xs"></i>
+            近 7 天 PV/UV 趋势 (7d Trend)
+          </h3>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={traffic7d}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 10}} />
+                <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 10}} />
+                <Tooltip />
+                <Area type="monotone" dataKey="pv" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.05} strokeWidth={2} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      {/* 4. 访问特征拆解 (TOP 榜单与终端占比) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="lg:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+          <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-6">TOP 10 访问省份</h3>
+          <div className="space-y-4">
+            {topLocations.map((item, idx) => (
+              <div key={idx} className="flex flex-col gap-1.5">
+                <div className="flex justify-between text-[11px] font-bold">
+                  <span className="text-slate-700">{item.name}</span>
+                  <span className="text-slate-400">{item.value}</span>
+                </div>
+                <div className="w-full h-1 bg-slate-50 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-blue-500 rounded-full" 
+                    style={{ width: `${(item.value / topLocations[0].value) * 100}%` }}
+                  ></div>
+                </div>
+              </div>
             ))}
           </div>
         </div>
 
-        {/* 核心指标 3 */}
-        <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-3xl">
-          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">弹性资源负载</p>
-          <div className="flex items-baseline gap-2">
-            <h3 className="text-2xl font-black text-cyan-400">62.4<span className="text-sm ml-0.5">%</span></h3>
-            <span className="text-[10px] text-slate-500 font-bold">AutoScale Off</span>
+        <div className="lg:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+          <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-6">移动端 vs PC 占比</h3>
+          <div className="h-48">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie data={deviceData} cx="50%" cy="50%" innerRadius={50} outerRadius={70} dataKey="value" stroke="none">
+                  {deviceData.map((entry, index) => <Cell key={index} fill={entry.color} />)}
+                </Pie>
+                <Tooltip />
+                <Legend verticalAlign="bottom" iconType="circle" wrapperStyle={{ fontSize: '10px', fontWeight: 'bold' }} />
+              </PieChart>
+            </ResponsiveContainer>
           </div>
-          <div className="w-full h-1 bg-slate-800 mt-4 rounded-full overflow-hidden">
-            <div className="h-full bg-cyan-500" style={{ width: '62%' }}></div>
+        </div>
+
+        <div className="lg:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+          <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-6">Android/iOS 占比</h3>
+          <div className="h-48">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie data={osData} cx="50%" cy="50%" innerRadius={50} outerRadius={70} dataKey="value" stroke="none">
+                  {osData.map((entry, index) => <Cell key={index} fill={entry.color} />)}
+                </Pie>
+                <Tooltip />
+                <Legend verticalAlign="bottom" iconType="circle" wrapperStyle={{ fontSize: '10px', fontWeight: 'bold' }} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="lg:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col">
+          <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-6">系统性能摘要</h3>
+          <div className="flex-1 flex flex-col justify-around">
+             <div className="text-center">
+                <p className="text-[10px] font-bold text-slate-400 mb-1 uppercase">平均响应耗时</p>
+                <h4 className="text-2xl font-black text-slate-900">42<span className="text-xs ml-1">ms</span></h4>
+             </div>
+             <div className="text-center">
+                <p className="text-[10px] font-bold text-slate-400 mb-1 uppercase">SLA 稳定性</p>
+                <h4 className="text-2xl font-black text-emerald-500">99.98%</h4>
+             </div>
+             <div className="text-center">
+                <p className="text-[10px] font-bold text-slate-400 mb-1 uppercase">异常拦截频次</p>
+                <h4 className="text-2xl font-black text-rose-500">2.4<span className="text-xs ml-1">/min</span></h4>
+             </div>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div className="lg:col-span-8 space-y-6">
-          <div className="bg-slate-900/40 border border-slate-800 rounded-[2rem] p-8">
-            <div className="flex justify-between items-center mb-10">
-              <div>
-                <h2 className="text-lg font-black text-white flex items-center gap-2">
-                  <i className="fa-solid fa-tower-broadcast text-indigo-400"></i>
-                  全链路延迟与质量热力图
-                </h2>
-                <p className="text-xs text-slate-500 mt-1">实时追踪登录、支付、直播间进入等核心 SLA 表现</p>
-              </div>
-              <div className="flex items-center gap-4 text-[10px] font-bold">
-                 <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded bg-cyan-500"></span> API 延迟</span>
-                 <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded bg-amber-500"></span> 直播卡顿</span>
-              </div>
-            </div>
-            
-            <div className="h-[320px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={latencyData}>
-                  <defs>
-                    <linearGradient id="colorApi" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.2}/>
-                      <stop offset="95%" stopColor="#06b6d4" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1e293b" />
-                  <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{fill: '#475569', fontSize: 11}} />
-                  <YAxis axisLine={false} tickLine={false} tick={{fill: '#475569', fontSize: 11}} />
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px' }}
-                  />
-                  <Area type="monotone" dataKey="api" stroke="#06b6d4" strokeWidth={3} fillOpacity={1} fill="url(#colorApi)" />
-                  <Area type="monotone" dataKey="live" stroke="#f59e0b" strokeWidth={2} fill="transparent" strokeDasharray="4 4" />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
+      {/* 5. TOP URL 与 IP 明细表格 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
+            <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">TOP URL 访问排名</h3>
+            <button className="text-[10px] font-bold text-blue-600">更多 <i className="fa-solid fa-angle-right"></i></button>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-slate-900/40 border border-slate-800 rounded-[2rem] p-8">
-              <h3 className="text-sm font-black text-white uppercase tracking-widest mb-8 flex items-center gap-2">
-                <i className="fa-solid fa-money-bill-transfer text-emerald-500"></i>
-                财务资产安全监测
-              </h3>
-              <div className="space-y-6">
-                <div>
-                  <div className="flex justify-between text-[11px] font-bold mb-2.5">
-                    <span className="text-slate-500">短时退费波动率</span>
-                    <span className="text-emerald-400">0.42% (正常)</span>
-                  </div>
-                  <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-emerald-500" style={{ width: '42%' }}></div>
-                  </div>
-                </div>
-                <div>
-                  <div className="flex justify-between text-[11px] font-bold mb-2.5">
-                    <span className="text-slate-500">大额提现风险暴露 (5w+)</span>
-                    <span className="text-amber-500">中度预警</span>
-                  </div>
-                  <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-amber-500" style={{ width: '75%' }}></div>
-                  </div>
-                </div>
-                <div className="pt-4 mt-4 border-t border-slate-800/50 flex items-center justify-between">
-                   <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                      <span className="text-xs font-bold text-slate-300">防机构跑路熔断机制已激活</span>
-                   </div>
-                   <button className="text-[10px] font-black text-indigo-400 hover:text-white uppercase">配置策略</button>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-slate-900/40 border border-slate-800 rounded-[2rem] p-8 relative overflow-hidden group">
-              <h3 className="text-sm font-black text-white uppercase tracking-widest mb-8 flex items-center gap-2">
-                <i className="fa-solid fa-water text-cyan-500"></i>
-                并发水位计 (Current Load)
-              </h3>
-              <div className="flex justify-center py-4">
-                 <div className="relative w-36 h-36 rounded-full border-4 border-slate-800 flex items-center justify-center overflow-hidden">
-                    <div 
-                      className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-cyan-600 to-indigo-500 transition-all duration-[2000ms] ease-in-out" 
-                      style={{ height: pulse ? '65%' : '60%' }}
-                    >
-                       <div className="absolute top-0 w-full h-4 bg-white/20 blur-md animate-pulse"></div>
-                    </div>
-                    <div className="relative z-10 text-center">
-                       <span className="text-4xl font-black text-white drop-shadow-lg">64</span>
-                       <span className="text-xs font-bold text-white/70 ml-0.5">%</span>
-                    </div>
-                 </div>
-              </div>
-              <div className="flex justify-between mt-6 text-[10px] font-mono text-slate-500">
-                <span>0 UNIT</span>
-                <span>MAX_CAP: 25,000</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="lg:col-span-4 space-y-6">
-          <div className="bg-slate-900/40 border border-slate-800 rounded-[2rem] p-8 h-full flex flex-col min-h-[600px]">
-            <div className="flex justify-between items-center mb-8">
-              <h2 className="text-lg font-black text-white flex items-center gap-2">
-                <i className="fa-solid fa-satellite text-rose-500"></i>
-                风险与运维实时流
-              </h2>
-              <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></div>
-            </div>
-            
-            <div className="flex-1 space-y-4 overflow-y-auto pr-2 custom-scrollbar">
-              {riskEvents.map((event) => (
-                <div key={event.id} className={`p-4 rounded-2xl border transition-all hover:bg-slate-800/40 ${
-                  event.level === 'danger' ? 'bg-rose-500/5 border-rose-500/20' : 
-                  event.level === 'warning' ? 'bg-amber-500/5 border-amber-500/20' : 
-                  'bg-slate-800/20 border-slate-800'
-                }`}>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className={`text-[9px] font-black px-1.5 py-0.5 rounded uppercase ${
-                      event.type === 'FINANCE' ? 'bg-emerald-500/20 text-emerald-500' :
-                      event.type === 'OPS' ? 'bg-cyan-500/20 text-cyan-500' :
-                      'bg-indigo-500/20 text-indigo-500'
-                    }`}>
-                      {event.type}
-                    </span>
-                    <span className="text-[9px] font-mono text-slate-600">{event.time}</span>
-                  </div>
-                  <p className="text-xs font-bold text-slate-200 leading-relaxed mb-3">{event.msg}</p>
-                  <div className="flex justify-between items-center pt-3 border-t border-slate-800/50">
-                    <span className={`text-[10px] font-black ${
-                      event.level === 'danger' ? 'text-rose-500' : 
-                      event.level === 'warning' ? 'text-amber-500' : 'text-slate-500'
-                    }`}>
-                      处置状态: {event.action}
-                    </span>
-                    <button className="text-[10px] font-black text-indigo-400 hover:text-white transition-colors">
-                      查看溯源
-                    </button>
-                  </div>
-                </div>
+          <table className="w-full text-left">
+            <thead className="bg-slate-50/50">
+              <tr>
+                <th className="px-6 py-3 text-[10px] font-black text-slate-400 uppercase">路径 (URL)</th>
+                <th className="px-4 py-3 text-[10px] font-black text-slate-400 uppercase text-center">PV</th>
+                <th className="px-4 py-3 text-[10px] font-black text-slate-400 uppercase text-center">UV</th>
+                <th className="px-6 py-3 text-[10px] font-black text-slate-400 uppercase text-right">成功率</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {topUrls.map((item, i) => (
+                <tr key={i} className="hover:bg-slate-50/50 transition-colors">
+                  <td className="px-6 py-4 text-[11px] font-mono text-slate-500 truncate max-w-[200px]">{item.url}</td>
+                  <td className="px-4 py-4 text-[11px] font-black text-slate-900 text-center">{item.pv}</td>
+                  <td className="px-4 py-4 text-[11px] font-bold text-slate-400 text-center">{item.uv}</td>
+                  <td className="px-6 py-4 text-[11px] font-black text-emerald-500 text-right">{item.success}</td>
+                </tr>
               ))}
-            </div>
-
-            <div className="mt-8 pt-8 border-t border-slate-800">
-               <div className="bg-slate-950/50 p-5 rounded-2xl border border-white/5">
-                  <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-                    <i className="fa-solid fa-brain text-indigo-400"></i>
-                    AI 内容巡检实时状态
-                  </h4>
-                  <div className="flex items-center gap-4">
-                     <div className="flex-1 h-1.5 bg-slate-800 rounded-full overflow-hidden flex">
-                        <div className="h-full bg-emerald-500 w-[92%]"></div>
-                        <div className="h-full bg-rose-500 w-[8%]"></div>
-                     </div>
-                     <span className="text-xs font-mono text-emerald-500 font-black">92%</span>
-                  </div>
-                  <p className="text-[9px] text-slate-600 mt-3 leading-relaxed">
-                    已巡检 2,480 场直播 / 自动禁言 12 人 / 内容合规率达标。
-                  </p>
-               </div>
-               {/* 修改：移除了底部的“生成风险月报”按钮 */}
-            </div>
-          </div>
+            </tbody>
+          </table>
         </div>
-      </div>
 
-      <div className="mt-8 flex justify-between items-center px-4 pt-6 border-t border-slate-800/50">
-        <div className="flex gap-10">
-          <div className="flex flex-col">
-            <span className="text-[9px] font-black text-slate-700 uppercase tracking-widest">Network Node</span>
-            <span className="text-xs font-black text-emerald-500 uppercase">Secured</span>
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
+            <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">TOP 访问 IP (高频黑名单特征)</h3>
+            <button className="text-[10px] font-bold text-rose-500">风险预警 <i className="fa-solid fa-shield-halved"></i></button>
           </div>
-          <div className="flex flex-col">
-            <span className="text-[9px] font-black text-slate-700 uppercase tracking-widest">Database Sync</span>
-            <span className="text-xs font-black text-emerald-500 uppercase">Active</span>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-[9px] font-black text-slate-700 uppercase tracking-widest">Encryption</span>
-            <span className="text-xs font-black text-indigo-500 uppercase">AES-256</span>
-          </div>
-        </div>
-        <div className="text-[9px] font-mono text-slate-800 tracking-tighter">
-          PRISM_KERNEL_X64 // COMMAND_CENTER_AUTH_OK // 2024.05.22
+          <table className="w-full text-left">
+            <thead className="bg-slate-50/50">
+              <tr>
+                <th className="px-6 py-3 text-[10px] font-black text-slate-400 uppercase">来源 IP</th>
+                <th className="px-4 py-3 text-[10px] font-black text-slate-400 uppercase">地理/运营商</th>
+                <th className="px-6 py-3 text-[10px] font-black text-slate-400 uppercase text-right">请求量</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {topIps.map((item, i) => (
+                <tr key={i} className="hover:bg-slate-50/50 transition-colors">
+                  <td className="px-6 py-4 text-[11px] font-mono font-bold text-blue-600">{item.ip}</td>
+                  <td className="px-4 py-4 text-[10px] font-bold text-slate-400">
+                    {item.country} · {item.province} ({item.isp})
+                  </td>
+                  <td className="px-6 py-4 text-[11px] font-black text-slate-900 text-right">{item.pv}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

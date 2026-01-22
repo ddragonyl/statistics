@@ -56,10 +56,6 @@ const App: React.FC = () => {
             </p>
           </div>
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-lg border border-emerald-100">
-               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-               <span className="text-xs font-bold">系统实时监控中</span>
-            </div>
             <button className="bg-white p-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all relative">
               <i className="fa-regular fa-bell"></i>
               <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white"></span>
