@@ -3,7 +3,8 @@ export enum DashboardType {
   BUSINESS = 'BUSINESS',
   INSTRUCTIONAL = 'INSTRUCTIONAL',
   MARKETING = 'MARKETING',
-  PLATFORM = 'PLATFORM'
+  PLATFORM = 'PLATFORM',
+  TRTC = 'TRTC'
 }
 
 export interface MetricCardData {

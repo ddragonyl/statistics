@@ -10,6 +10,7 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
   const menuItems = [
     { id: DashboardType.BUSINESS, label: '经营看板', icon: 'fa-chart-line' },
+    { id: DashboardType.TRTC, label: 'TRTC 消耗', icon: 'fa-tower-broadcast' },
     { id: DashboardType.INSTRUCTIONAL, label: '教学效能', icon: 'fa-graduation-cap' },
     { id: DashboardType.MARKETING, label: '营销转化', icon: 'fa-filter' },
     { id: DashboardType.PLATFORM, label: '运维风控', icon: 'fa-shield-halved' },

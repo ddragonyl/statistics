@@ -5,6 +5,7 @@ import BusinessBoard from './components/BusinessBoard';
 import InstructionalBoard from './components/InstructionalBoard';
 import MarketingBoard from './components/MarketingBoard';
 import PlatformBoard from './components/PlatformBoard';
+import TRTCBoard from './components/TRTCBoard';
 import { DashboardType } from './types';
 
 const App: React.FC = () => {
@@ -14,6 +15,8 @@ const App: React.FC = () => {
     switch (activeTab) {
       case DashboardType.BUSINESS:
         return <BusinessBoard />;
+      case DashboardType.TRTC:
+        return <TRTCBoard />;
       case DashboardType.INSTRUCTIONAL:
         return <InstructionalBoard />;
       case DashboardType.MARKETING:
@@ -28,9 +31,10 @@ const App: React.FC = () => {
   const getTitle = () => {
     switch (activeTab) {
       case DashboardType.BUSINESS: return '经营看板';
+      case DashboardType.TRTC: return 'TRTC 消耗分析';
       case DashboardType.INSTRUCTIONAL: return '教学效能';
       case DashboardType.MARKETING: return '营销转化';
-      // case DashboardType.PLATFORM: return '运维风控';
+      case DashboardType.PLATFORM: return '运维风控';
       default: return '棱镜数据监控平台';
     }
   };
@@ -45,6 +49,7 @@ const App: React.FC = () => {
             <h1 className="text-3xl font-black text-slate-900 tracking-tight">{getTitle()}</h1>
             <p className="text-slate-500 font-medium mt-1">
               {activeTab === DashboardType.BUSINESS && '实时监控机构生命线，掌控整体营收与经营健康度'}
+              {activeTab === DashboardType.TRTC && '分析实时音视频云消耗，优化机构运营成本与利润空间'}
               {activeTab === DashboardType.INSTRUCTIONAL && '全方位洞察教学质量与学情反馈，提升完课率'}
               {activeTab === DashboardType.MARKETING && '精准定位流量流失环节，提升工具效能与转化 ROI'}
               {activeTab === DashboardType.PLATFORM && '监控 SaaS 资源水位与并发峰值，守护平台底层安全'}
@@ -55,7 +60,6 @@ const App: React.FC = () => {
                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                <span className="text-xs font-bold">系统运行正常</span>
             </div>
-            {/* 核心修改：移除“生成全平台体验报告”按钮 */}
             <button className="bg-white p-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all relative">
               <i className="fa-regular fa-bell"></i>
               <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white"></span>
