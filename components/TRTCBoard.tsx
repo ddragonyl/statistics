@@ -11,22 +11,30 @@ const costComposition = [
   { name: '录制', value: 25, color: '#ef4444' },
   { name: '白板', value: 10, color: '#10b981' },
   { name: '快直播流量', value: 15, color: '#f59e0b' },
-  { name: '混流转推', value: 5, color: '#8b5cf6' },
+  { name: '混流转推费', value: 5, color: '#8b5cf6' },
 ];
 
 const costTrend = [
-  { month: '1月', av: 9500, rec: 6800, traffic: 3000 },
-  { month: '2月', av: 11000, rec: 7500, traffic: 3800 },
-  { month: '3月', av: 12500, rec: 8200, traffic: 4200 },
-  { month: '4月', av: 13200, rec: 8900, traffic: 4800 },
+  { month: '1月', av: 10200, rec: 6800, traffic: 3200 },
+  { month: '2月', av: 11500, rec: 7500, traffic: 3800 },
+  { month: '3月', av: 12400, rec: 8200, traffic: 4300 },
+  { month: '4月', av: 13200, rec: 8900, traffic: 4700 },
   { month: '5月', av: 12800, rec: 8500, traffic: 4500 },
   { month: '6月', av: 12350, rec: 8240, traffic: 4320 },
 ];
 
-const dailyTrend = Array.from({ length: 30 }, (_, i) => ({
-  date: `${i + 1}日`,
-  count: 80 + Math.sin(i * 0.5) * 30 + Math.random() * 20
-}));
+const liveCountTrend = [
+  { date: '1月1日', count: 80 }, { date: '1月2日', count: 115 }, { date: '1月3日', count: 87 },
+  { date: '1月4日', count: 125 }, { date: '1月5日', count: 54 }, { date: '1月6日', count: 81 },
+  { date: '1月7日', count: 69 }, { date: '1月8日', count: 75 }, { date: '1月9日', count: 89 },
+  { date: '1月10日', count: 82 }, { date: '1月11日', count: 46 }, { date: '1月12日', count: 70 },
+  { date: '1月13日', count: 88 }, { date: '1月14日', count: 124 }, { date: '1月15日', count: 35 },
+  { date: '1月16日', count: 78 }, { date: '1月17日', count: 98 }, { date: '1月18日', count: 126 },
+  { date: '1月19日', count: 80 }, { date: '1月20日', count: 127 }, { date: '1月21日', count: 92 },
+  { date: '1月22日', count: 70 }, { date: '1月23日', count: 81 }, { date: '1月24日', count: 86 },
+  { date: '1月25日', count: 118 }, { date: '1月26日', count: 56 }, { date: '1月27日', count: 98 },
+  { date: '1月28日', count: 82 }, { date: '1月29日', count: 113 }, { date: '1月30日', count: 73 },
+];
 
 const comparisonData = [
   { month: '1月', revenue: 120000, cost: 22000 },
@@ -207,7 +215,84 @@ const TRTCBoard: React.FC = () => {
         </div>
       </section>
 
-      {/* 3. 机构消耗明细清单 */}
+      {/* 3. 新增图表组 (根据截图增加) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* TRTC费用构成 */}
+        <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
+          <h3 className="text-lg font-black text-slate-900 mb-8">TRTC费用构成</h3>
+          <div className="h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie 
+                  data={costComposition} 
+                  cx="50%" cy="50%" 
+                  innerRadius={80} outerRadius={110} 
+                  paddingAngle={5} 
+                  dataKey="value" 
+                  stroke="none"
+                >
+                  {costComposition.map((entry, index) => <Cell key={index} fill={entry.color} />)}
+                </Pie>
+                <Tooltip />
+                <Legend iconType="rect" verticalAlign="bottom" wrapperStyle={{ fontSize: '11px', fontWeight: 'bold', paddingTop: '20px' }} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* 费用趋势分析 */}
+        <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
+          <h3 className="text-lg font-black text-slate-900 mb-8">费用趋势分析</h3>
+          <div className="h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={costTrend}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 11, fontWeight: 'bold'}} />
+                <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 11, fontWeight: 'bold'}} />
+                <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
+                <Legend verticalAlign="top" align="right" iconType="rect" iconSize={12} wrapperStyle={{ fontSize: '11px', fontWeight: 'bold', paddingBottom: '20px' }} />
+                <Line type="monotone" name="音视频" dataKey="av" stroke="#3b82f6" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                <Line type="monotone" name="录制" dataKey="rec" stroke="#ef4444" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                <Line type="monotone" name="快直播流量" dataKey="traffic" stroke="#f59e0b" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      {/* 直播数趋势 (全宽图表) */}
+      <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
+        <h3 className="text-lg font-black text-slate-900 mb-10">直播数趋势</h3>
+        <div className="h-80">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={liveCountTrend}>
+              <defs>
+                <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.1}/>
+                  <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" vertical={true} stroke="#f1f5f9" />
+              <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 10, fontWeight: 'bold'}} interval={1} angle={-30} textAnchor="end" />
+              <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 11, fontWeight: 'bold'}} />
+              <Tooltip />
+              <Legend verticalAlign="top" align="center" iconType="rect" wrapperStyle={{ paddingBottom: '30px', fontSize: '12px', fontWeight: 'bold' }} />
+              <Area 
+                type="monotone" 
+                name="直播数" 
+                dataKey="count" 
+                stroke="#8b5cf6" 
+                strokeWidth={4} 
+                fillOpacity={1} 
+                fill="url(#colorCount)" 
+                activeDot={{ r: 8, strokeWidth: 0 }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* 4. 机构消耗明细清单 */}
       <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
         <div className="px-8 py-6 border-b border-slate-50 flex justify-between items-center">
           <h3 className="text-lg font-black text-slate-900">机构消耗明细清单</h3>
@@ -262,21 +347,18 @@ const TRTCBoard: React.FC = () => {
         </div>
       </div>
 
-      {/* 弹窗逻辑 - 统计信息 (原机构画像) */}
+      {/* 弹窗逻辑 - 统计信息 */}
       {showProfile && (
         <Modal title={`👤 统计信息 - ${showProfile}`} onClose={() => setShowProfile(null)}>
            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-             
              {/* 左侧列 */}
              <div className="space-y-6">
-                {/* 机构活跃度 */}
                 <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm relative overflow-hidden">
                    <h4 className="text-sm font-bold text-slate-800 mb-6">机构活跃度</h4>
                    <div className="flex justify-between items-baseline mb-4">
                       <span className="text-xs font-medium text-slate-400 uppercase tracking-widest">活跃度评分</span>
                       <span className="text-2xl font-black text-slate-900">85<span className="text-sm text-slate-400">/100</span></span>
                    </div>
-                   {/* 进度条 */}
                    <div className="relative h-2 bg-slate-100 rounded-full mb-2">
                       <div className="absolute top-0 left-0 h-full bg-blue-500 rounded-full" style={{ width: '85%' }}></div>
                    </div>
@@ -285,14 +367,12 @@ const TRTCBoard: React.FC = () => {
                       <span>中</span>
                       <span>高</span>
                    </div>
-                   {/* 级别徽章 */}
                    <div className="absolute top-6 right-6 text-right">
                       <p className="text-4xl font-black text-slate-800 tracking-tighter">A级</p>
                       <p className="text-[10px] font-bold text-slate-400 uppercase">机构等级</p>
                    </div>
                 </div>
 
-                {/* 课程类型偏好 */}
                 <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
                    <h4 className="text-sm font-bold text-slate-800 mb-6">课程类型偏好</h4>
                    <div className="h-64 flex flex-col items-center">
@@ -311,7 +391,6 @@ const TRTCBoard: React.FC = () => {
                           <Tooltip />
                         </PieChart>
                       </ResponsiveContainer>
-                      {/* 自定义 Legend */}
                       <div className="grid grid-cols-3 gap-y-3 gap-x-6 mt-4 w-full px-4">
                          {coursePreferenceData.map((item, idx) => (
                            <div key={idx} className="flex items-center gap-2">
@@ -323,7 +402,6 @@ const TRTCBoard: React.FC = () => {
                    </div>
                 </div>
 
-                {/* 关键指标 */}
                 <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
                    <h4 className="text-sm font-bold text-slate-800 mb-6">关键指标</h4>
                    <div className="grid grid-cols-2 gap-4">
@@ -344,7 +422,6 @@ const TRTCBoard: React.FC = () => {
 
              {/* 右侧列 */}
              <div className="space-y-6">
-                {/* 班型偏好 */}
                 <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
                    <h4 className="text-sm font-bold text-slate-800 mb-6">班型偏好</h4>
                    <div className="h-64 flex flex-col items-center">
@@ -374,7 +451,6 @@ const TRTCBoard: React.FC = () => {
                    </div>
                 </div>
 
-                {/* 教学方式偏好 */}
                 <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
                    <h4 className="text-sm font-bold text-slate-800 mb-6">教学方式偏好</h4>
                    <div className="h-64 flex flex-col items-center">
